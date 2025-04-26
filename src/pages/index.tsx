@@ -111,7 +111,7 @@ export default function Home() {
         key={reel.id}
         className="reel"
         style={{
-          height: '100vh',
+          height: '88vh',
           scrollSnapAlign: 'start',
           display: 'flex',
           justifyContent: 'center',
@@ -124,7 +124,7 @@ export default function Home() {
             position: 'relative',
             width: '100%',
             maxWidth: '420px',
-            // height: '100%',
+            height: '100%',
           }}
         >
           <video
@@ -139,7 +139,7 @@ export default function Home() {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'contain',
+              objectFit: 'cover',
               cursor: 'pointer',
             }}
             onClick={(e) => {
