@@ -10,12 +10,10 @@ export async function generateScript(celebrityName: string) {
 
     Write a clean, plain-text monologue about the life and legacy of ${celebrityName}.
 
-    - The script should be paced to last around **30 seconds** when read aloud in a natural American accent (like Matthew from Amazon Polly).
     - The script should be around **200 words** in total.
-    - Use short, emotionally engaging **sentences** and **brief paragraphs** that flow naturally like a voiceover.
+    - Use emotionally engaging **sentences** and **brief paragraphs** that flow naturally like a voiceover.
     - Do NOT include any sound cues like "(music swells)" or "(soft piano begins)".
     - Do NOT use parentheses, bullets, numbers, or stage directions.
-    - Highlight only the most iconic career milestones and one personal insight that defined them.
     - Keep it plain, natural, and vivid — as if someone is simply telling the story aloud for a short documentary.
 
     Return only plain paragraph text.
