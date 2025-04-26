@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm } from 'formidable';
+import fs from 'fs';
+import FormData from 'form-data';
+import fetch from 'node-fetch';
+
 import { generateScript } from '@/lib/gemini';
 import { fetchImages } from '@/lib/pexels';
 import { textToSpeech } from '@/lib/polly';
@@ -24,62 +28,75 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const rawName = fields.name;
-      const name = Array.isArray(rawName) ? rawName[0] : rawName;
-      if (!name) return res.status(400).json({ error: 'Missing name' });
+      const name = Array.isArray(fields.name) ? fields.name[0] : fields.name;
+      const sport = Array.isArray(fields.sport) ? fields.sport[0] : fields.sport || 'unknown';
+      const thumbnail = Array.isArray(fields.thumbnail) ? fields.thumbnail[0] : fields.thumbnail || 'unknown';
 
-      // 1. Generate script
-      const scriptData = await generateScript(name);
-      console.log('Script:', scriptData);
+      if (!name) return res.status(400).json({ error: 'Missing player name' });
 
-      // 2. Resolve images: uploaded or fetch from Pexels
-      let imagePaths: string[] = [];
+      const { script } = await generateScript(name);
+
       const fileArray = Array.isArray(files.images) ? files.images : files.images ? [files.images] : [];
+      let imagePaths: string[] = [];
 
       if (fileArray.length > 0) {
         imagePaths = fileArray.map((file: any) => file.filepath);
-        console.log('Using uploaded images:', imagePaths);
       } else {
         imagePaths = await fetchImages(name, 5);
-        console.log('Fetched images from Pexels:', imagePaths);
       }
 
-      // 3. Convert script to voice
-      const audioPath = await textToSpeech(scriptData.script);
-      console.log('Audio:', audioPath);
+      const audioPath = await textToSpeech(script);
+			if (!audioPath || !fs.existsSync(audioPath)) {
+				throw new Error('Audio file does not exist or failed to generate');
+			}
 
-      // 4. Generate video
-      const videoPath = await generateVideo({
-        imageUrls: imagePaths,
-        audioPath,
-        scriptText: scriptData.script
-      });
-      console.log('Video path:', videoPath);
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('sport', sport);
+      formData.append('thumbnail', thumbnail);
+      formData.append('audio', fs.createReadStream(audioPath), {
+				filename: 'voiceover.mp3',
+				contentType: 'audio/mpeg'
+			});
 
-      // tried runway ml - gave you dont have enough credits error
-			// const imagePath = images[0];
-			// const videoPath = await generateVideoFromRunway(imagePath, scriptData.script);
-
-			const rawSport = fields.sport;
-			const sport = Array.isArray(rawSport) ? rawSport[0] : rawSport || 'unknown';
-
-			const rawThumbnail = fields.thumbnail;
-			const thumbnail = Array.isArray(rawThumbnail) ? rawThumbnail[0] : rawThumbnail || 'unknown';
-
-      // 5. Upload to S3
-      const s3Key = await uploadToS3(videoPath, {
-        celebrity: name,
-        duration: '30',
-        generated_on: new Date().toISOString(),
+      for (const path of imagePaths) {
+        if (path.startsWith('/')) {
+          formData.append('images', fs.createReadStream(path));
+        } else {
+          const response = await fetch(path);
+          const buffer = await response.buffer();
+          const tmpPath = `/tmp/img-${Date.now()}-${Math.random()}.jpg`;
+          fs.writeFileSync(tmpPath, buffer);
+          formData.append('images', fs.createReadStream(tmpPath));
+        }
+      }
+			console.log('[UPLOAD DEBUG]', {
+				name,
 				sport,
-				thumbnail
-      });
+				thumbnail,
+				audioPath,
+				imagePaths
+			});
 
-      res.status(200).json({
-        message: 'Reel generated successfully!',
-        s3Key,
-        celebrity: name
-      });
+      const backendRes = await fetch(
+        'https://essentially-sports-reels-ffmpeg-backend.onrender.com/ffmpeg/generate-video',
+        {
+          method: 'POST',
+          body: formData as any,
+          headers: formData.getHeaders(),
+        }
+      );
+
+			const backendJson = await backendRes.json() as any;
+			if (!backendRes.ok) {
+				throw new Error(backendJson?.details || 'Backend generation failed');
+			}
+
+			return res.status(200).json({
+				message: 'Reel generated successfully!',
+				s3Key: backendJson.s3Key,
+				celebrity: name,
+			});
     } catch (err: any) {
       console.error('[REEL_GENERATION_ERROR]', err);
       res.status(500).json({ error: 'Failed to generate reel', details: err.message });
