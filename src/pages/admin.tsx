@@ -47,7 +47,8 @@ export default function AdminPanel() {
 
   return (
     <div className="max-w-screen-sm flex justify-center m-2">
-      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md border border-gray-200">
+      <div className="p-8 w-full aspect-w-9 aspect-h-16 p-4">
+      {/* <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md border border-gray-200"> */}
         <h1 className="text-xl font-semibold text-gray-800 mb-1 text-center">
           Generate Reels
         </h1>

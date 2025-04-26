@@ -16,6 +16,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const [likedReels, setLikedReels] = useState<{ [id: string]: boolean }>({});
+  const [followed, setFollowed] = useState<{ [id: string]: boolean }>({});
 
   useEffect(() => {
     async function fetchReels() {
@@ -135,7 +136,7 @@ export default function Home() {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: 'contain',
               cursor: 'pointer',
             }}
             onClick={(e) => {
@@ -206,6 +207,33 @@ export default function Home() {
               <FiPlus size={30} />
             </button>
           </div>
+
+          <div className="absolute bottom-[6%] left-5 text-white z-10 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <img
+                src={`https://api.dicebear.com/7.x/thumbs/svg?seed=${encodeURIComponent(reel.celebrity)}`}
+                alt="avatar"
+                className="w-8 h-8 rounded-full border border-white"
+              />
+              <span className="font-bold text-base">{reel.celebrity}</span>
+              <button
+                onClick={() =>
+                  setFollowed((prev) => ({
+                    ...prev,
+                    [reel.id]: !prev[reel.id],
+                  }))
+                }
+                className={`font-bold text-sm px-4 py-1 rounded-full border ${
+                  followed[reel.id]
+                    ? 'border-white bg-white text-black'
+                    : 'border-white text-white'
+                } transition duration-200`}
+              >
+                {followed[reel.id] ? 'Following' : 'Follow'}
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
       ))}
