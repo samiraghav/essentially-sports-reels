@@ -1,4 +1,3 @@
-// src/pages/api/admin/unsplash.ts
 import { NextApiRequest, NextApiResponse } from "next";
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY!;
 

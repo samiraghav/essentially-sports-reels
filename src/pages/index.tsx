@@ -10,7 +10,7 @@ type Reel = {
   generated_on: string;
   duration: string;
   sport: string;
-  thumb: string;
+  thumbnail: string;
 };
 
 export default function Home() {
@@ -214,7 +214,7 @@ export default function Home() {
           <div className="absolute bottom-[6%] left-5 text-white z-10 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <img
-                src={reel.thumb?.trim() ? reel.thumb : defaultPlayer.src}
+                src={reel.thumbnail?.trim() ? reel.thumbnail : defaultPlayer.src}
                 alt="avatar"
                 className="w-8 h-8 rounded-full border border-white"
               />

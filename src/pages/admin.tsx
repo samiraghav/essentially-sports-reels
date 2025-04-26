@@ -21,7 +21,7 @@ export default function AdminPanel() {
       const formData = new FormData();
       formData.append('name', name);
       formData.append('sport', selectedSport);
-      formData.append('thumb', selectedThumb);
+      formData.append('thumbnail', selectedThumb);
       selectedImages.forEach((file) => {
         formData.append('images', file);
       });

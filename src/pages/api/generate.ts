@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm } from 'formidable';
-import fs from 'fs';
 import { generateScript } from '@/lib/gemini';
 import { fetchImages } from '@/lib/pexels';
 import { textToSpeech } from '@/lib/polly';
@@ -64,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			const rawSport = fields.sport;
 			const sport = Array.isArray(rawSport) ? rawSport[0] : rawSport || 'unknown';
 
-			const rawThumbnail = fields.thumb;
+			const rawThumbnail = fields.thumbnail;
 			const thumbnail = Array.isArray(rawThumbnail) ? rawThumbnail[0] : rawThumbnail || 'unknown';
 
       // 5. Upload to S3

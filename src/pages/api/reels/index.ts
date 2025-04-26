@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             generated_on: meta.Metadata?.generated_on || '',
             duration: meta.Metadata?.duration || '60',
             sport: meta.Metadata?.sport || 'NA',
-            thumb: meta.Metadata?.thumb || ''
+            thumbnail: meta.Metadata?.thumbnail || ''
           };
         })
     );
