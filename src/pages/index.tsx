@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FiHeart, FiMessageCircle, FiShare2, FiPlus } from 'react-icons/fi';
 import { AiFillHeart } from 'react-icons/ai';
+import defaultPlayer from '../../public/default-player.svg'
 
 type Reel = {
   id: string;
@@ -8,6 +9,8 @@ type Reel = {
   celebrity: string;
   generated_on: string;
   duration: string;
+  sport: string;
+  thumb: string;
 };
 
 export default function Home() {
@@ -211,11 +214,15 @@ export default function Home() {
           <div className="absolute bottom-[6%] left-5 text-white z-10 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <img
-                src={`https://api.dicebear.com/7.x/thumbs/svg?seed=${encodeURIComponent(reel.celebrity)}`}
+                src={reel.thumb?.trim() ? reel.thumb : defaultPlayer.src}
                 alt="avatar"
                 className="w-8 h-8 rounded-full border border-white"
               />
-              <span className="font-bold text-base">{reel.celebrity}</span>
+              <span className="font-bold text-base">
+                {reel.celebrity.length > 15
+                  ? reel.celebrity.slice(0, 15) + '...'
+                  : reel.celebrity}
+              </span>
               <button
                 onClick={() =>
                   setFollowed((prev) => ({

@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function AdminPanel() {
   const [name, setName] = useState('');
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedSport, setSelectedSport] = useState('');
+  const [playerSuggestions, setPlayerSuggestions] = useState<any[]>([]);
+  const [selectedThumb, setSelectedThumb] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleGenerate = async () => {
     if (!name.trim()) return setStatus('Please enter sports celebrity name.');
@@ -13,37 +18,76 @@ export default function AdminPanel() {
     setLoading(true);
 
     try {
-        const formData = new FormData();
-        formData.append('name', name);
-        selectedImages.forEach((file) => {
-            formData.append('images', file);
-        });
-        
-        const res = await fetch('/api/generate', {
-            method: 'POST',
-            body: formData,
-        });
-        
-        if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`Server error: ${res.status} - ${errorText}`);
-        }
-        
-        const data = await res.json();
-        setStatus(data.message || 'Done!');
-        setTimeout(() => setStatus(''), 5000);
-        } catch (err: any) {
-        console.error('Generate failed:', err);
-        setStatus('Failed to generate. Please try again later.');
-        }
-        
-        setLoading(false);
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('sport', selectedSport);
+      formData.append('thumb', selectedThumb);
+      selectedImages.forEach((file) => {
+        formData.append('images', file);
+      });
+
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Server error: ${res.status} - ${errorText}`);
+      }
+
+      const data = await res.json();
+      setStatus(data.message || 'Done!');
+      setTimeout(() => setStatus(''), 5000);
+    } catch (err: any) {
+      console.error('Generate failed:', err);
+      setStatus('Failed to generate. Please try again later.');
+    }
+
+    setLoading(false);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setSelectedImages(prev => [...prev, ...files]);
   };
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (name.length < 2) {
+        setPlayerSuggestions([]);
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`);
+        const data = await res.json();
+        if (data.player) {
+          setPlayerSuggestions(data.player);
+          setShowDropdown(true);
+        }
+      } catch (err) {
+        console.error('Failed to fetch player suggestions:', err);
+      }
+    };
+
+    const timeout = setTimeout(() => {
+      fetchPlayers();
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [name]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <div className="max-w-screen-sm flex justify-center m-2">
@@ -63,19 +107,54 @@ export default function AdminPanel() {
         <input
           type="text"
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            setShowDropdown(true);
+          }}
           placeholder="e.g. Virat Kohli"
-          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
+        {showDropdown && playerSuggestions.length > 0 && (
+          <div
+            ref={dropdownRef}
+            className="absolute z-10 bg-white border border-gray-300 w-full mt-1 max-h-60 overflow-y-auto max-w-[300px] rounded-md shadow-lg"
+          >
+            {playerSuggestions.map((player) => (
+              <div
+                key={player.idPlayer}
+                className="px-4 py-2 hover:bg-blue-100 cursor-pointer text-sm text-gray-800 flex items-center gap-2"
+                onClick={() => {
+                  setName(player.strPlayer);
+                  setSelectedSport(player.strSport || '');
+                  setSelectedThumb(player.strThumb || '');
+                  setPlayerSuggestions([]);
+                  setShowDropdown(false);
+                }}
+              >
+                {player.strThumb && (
+                  <img src={player.strThumb} alt={player.strPlayer} className="w-6 h-6 rounded-full object-cover" />
+                )}
+                {player.strPlayer} ({player.strSport})
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sport</label>
+          <input
+            type="text"
+            value={selectedSport}
+            readOnly
+            className="block w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 cursor-not-allowed"
+          />
+        </div>
 
         <div className="mt-6">
           <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-2">
             Upload Images (PNG or JPG) (Optional)
           </label>
-          {/* <span className="block text-sm font-medium text-gray-700 mb-2">
-            DO NOT USE COPYRIGHTED IMAGES OTHERWISE VIDEO GENERATION WILL FAIL
-          </span> */}
-
           <div className="flex items-center justify-center w-full">
             <label
               htmlFor="file-upload"
@@ -179,10 +258,10 @@ export default function AdminPanel() {
           </p>
         )}
         <button
-            onClick={() => (window.location.href = '/')}
-            className="mt-6 w-full bg-indigo-600 text-white font-medium py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm "
-            >
-            View Reels
+					onClick={() => (window.location.href = '/')}
+					className="mt-6 w-full bg-indigo-600 text-white font-medium py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm "
+					>
+					View Reels
         </button>
       </div>
     </div>
