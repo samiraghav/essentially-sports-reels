@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const items = await Promise.all(
       (data.Contents || [])
-        .filter((item) => item.Key && item.Key.endsWith('.mp4')) // ✅ ensure .mp4
+        .filter((item) => item.Key && item.Key.endsWith('.mp4'))
         .map(async (item) => {
           const id = item.Key!.split('/')[1]?.replace('.mp4', '');
 
@@ -38,7 +38,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
     );
 
-    // ✅ Remove nulls (skipped/empty keys)
     const filtered = items.filter(Boolean);
 
     res.status(200).json({ reels: filtered });

@@ -57,6 +57,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       console.log('Video path:', videoPath);
 
+      // tried runway ml - gave you dont have enough credits error
+			// const imagePath = images[0];
+			// const videoPath = await generateVideoFromRunway(imagePath, scriptData.script);
+
       // 5. Upload to S3
       const s3Key = await uploadToS3(videoPath, {
         celebrity: name,
