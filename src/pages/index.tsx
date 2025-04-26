@@ -25,16 +25,17 @@ export default function Home() {
     async function fetchReels() {
       const res = await fetch('/api/reels');
       const data = await res.json();
-
-      const sortedReels = [...(data.reels as Reel[] || [])].sort(
-        (a, b) => new Date(b.generated_on).getTime() - new Date(a.generated_on).getTime()
-      );
-
+  
+      const sortedReels = (data.reels || [])
+        .filter((r: Reel) => !!r.generated_on)
+        .sort((a: Reel, b: Reel) => {
+          return new Date(b.generated_on).getTime() - new Date(a.generated_on).getTime();
+        });
+  
       setReels(sortedReels);
 
       const urlsMap: { [key: string]: string } = {};
-
-      for (const reel of data.reels) {
+      for (const reel of sortedReels) {
         const res = await fetch(`/api/reels/${reel.id}`);
         const { url } = await res.json();
         urlsMap[reel.id] = url;
