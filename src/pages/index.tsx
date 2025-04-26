@@ -111,7 +111,7 @@ export default function Home() {
         key={reel.id}
         className="reel"
         style={{
-          height: '88vh',
+          height: '100vh',
           scrollSnapAlign: 'start',
           display: 'flex',
           justifyContent: 'center',
