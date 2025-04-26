@@ -1,34 +1,38 @@
+@import 'tailwindcss';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  padding: 0;
-  margin: 0;
-  background: black;
-  color: white;
-  font-family: sans-serif;
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+ 
 ::-webkit-scrollbar {
   display: none;
 }
 
-
-.animated-button.animate {
-  animation: pop 0.3s ease;
-}
-
-@keyframes pop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.5);
-  }
-  100% {
-    transform: scale(1);
-  }
+.animated-button {
+  color: white;
+  font-size: 1.8rem;
+  background: transparent;
+  border: none;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  cursor: pointer;
 }
 
