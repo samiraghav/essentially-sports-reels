@@ -124,7 +124,7 @@ export default function Home() {
             position: 'relative',
             width: '100%',
             maxWidth: '420px',
-            height: '100%',
+            // height: '100%',
           }}
         >
           <video
