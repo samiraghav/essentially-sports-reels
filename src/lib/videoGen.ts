@@ -5,7 +5,8 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import fetch from 'node-fetch';
 
-ffmpeg.setFfmpegPath(ffmpegPath!);
+ffmpeg.setFfmpegPath(path.resolve(ffmpegPath!));
+console.log('Using ffmpeg binary at:', ffmpegPath);
 
 export async function generateVideo({
   imageUrls,
@@ -26,27 +27,21 @@ export async function generateVideo({
     const filePath = path.join(tmpDir, `img${i}.jpg`);
 
     if (image.startsWith('http')) {
-      // Download image from remote URL
       const res = await fetch(image);
       if (!res.ok) throw new Error(`Failed to fetch image: ${image}`);
       const buffer = await res.buffer();
       fs.writeFileSync(filePath, buffer);
     } else {
-      // Local file (uploaded) — copy it
       fs.copyFileSync(image, filePath);
     }
 
     imagePaths.push(filePath);
   }
 
-  // Generate ffmpeg concat file
   const inputFileList = path.join(tmpDir, 'images.txt');
   const durationPerImage = 5;
 
-  const content = imagePaths
-    .map(p => `file '${p}'\nduration ${durationPerImage}`)
-    .join('\n');
-
+  const content = imagePaths.map(p => `file '${p}'\nduration ${durationPerImage}`).join('\n');
   const lastImage = `file '${imagePaths[imagePaths.length - 1]}'`;
 
   fs.writeFileSync(inputFileList, `${content}\n${lastImage}\n${lastImage}`);
