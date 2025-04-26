@@ -31,9 +31,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return {
             id,
             key: item.Key,
-            celebrity: meta.Metadata?.celebrity || 'Unknown',
+            celebrity: meta.Metadata?.celebrity || 'NA',
             generated_on: meta.Metadata?.generated_on || '',
-            duration: meta.Metadata?.duration || '60'
+            duration: meta.Metadata?.duration || '60',
+            sport: meta.Metadata?.sport || 'NA',
+            thumb: meta.Metadata?.thumb || ''
           };
         })
     );

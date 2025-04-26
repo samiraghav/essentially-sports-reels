@@ -61,11 +61,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			// const imagePath = images[0];
 			// const videoPath = await generateVideoFromRunway(imagePath, scriptData.script);
 
+			const rawSport = fields.sport;
+			const sport = Array.isArray(rawSport) ? rawSport[0] : rawSport || 'unknown';
+
+			const rawThumbnail = fields.thumb;
+			const thumbnail = Array.isArray(rawThumbnail) ? rawThumbnail[0] : rawThumbnail || 'unknown';
+
       // 5. Upload to S3
       const s3Key = await uploadToS3(videoPath, {
         celebrity: name,
         duration: '30',
-        generated_on: new Date().toISOString()
+        generated_on: new Date().toISOString(),
+				sport,
+				thumbnail
       });
 
       res.status(200).json({
