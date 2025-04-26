@@ -54,10 +54,10 @@ export default function AdminPanel() {
 
   useEffect(() => {
     const fetchPlayers = async () => {
-      if (name.length < 2) {
-        setPlayerSuggestions([]);
-        return;
-      }
+      if (!showDropdown || name.length < 2) {
+				setPlayerSuggestions([]);
+				return;
+			}
 
       try {
         const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`);
@@ -125,12 +125,17 @@ export default function AdminPanel() {
                 key={player.idPlayer}
                 className="px-4 py-2 hover:bg-blue-100 cursor-pointer text-sm text-gray-800 flex items-center gap-2"
                 onClick={() => {
-                  setName(player.strPlayer);
-                  setSelectedSport(player.strSport || '');
-                  setSelectedThumb(player.strThumb || '');
-                  setPlayerSuggestions([]);
-                  setShowDropdown(false);
-                }}
+									setName(player.strPlayer);
+									setSelectedSport(player.strSport || '');
+									setSelectedThumb(player.strThumb || '');
+								
+									setPlayerSuggestions([]);
+									setShowDropdown(false);
+								
+									setTimeout(() => {
+										setPlayerSuggestions([]);
+									}, 0);
+								}}
               >
                 {player.strThumb && (
                   <img src={player.strThumb} alt={player.strPlayer} className="w-6 h-6 rounded-full object-cover" />
