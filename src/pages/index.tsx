@@ -1,18 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
+import { FiHeart, FiMessageCircle, FiShare2, FiPlus } from 'react-icons/fi';
+import { AiFillHeart } from 'react-icons/ai';
+
+type Reel = {
+  id: string;
+  key: string;
+  celebrity: string;
+  generated_on: string;
+  duration: string;
+};
 
 export default function Home() {
-  const [reels, setReels] = useState<any[]>([]);
+  const [reels, setReels] = useState<Reel[]>([]);
   const [urls, setUrls] = useState<{ [key: string]: string }>({});
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<HTMLVideoElement[]>([]);
+  const [likedReels, setLikedReels] = useState<{ [id: string]: boolean }>({});
 
   useEffect(() => {
     async function fetchReels() {
       const res = await fetch('/api/reels');
       const data = await res.json();
 
-      const sortedReels = (data.reels || []).sort(
-        (a: any, b: any) => new Date(b.generated_on).getTime() - new Date(a.generated_on).getTime()
+      const sortedReels = [...(data.reels as Reel[] || [])].sort(
+        (a, b) => new Date(b.generated_on).getTime() - new Date(a.generated_on).getTime()
       );
 
       setReels(sortedReels);
@@ -31,7 +42,6 @@ export default function Home() {
     fetchReels();
   }, []);
 
-  // Auto play/pause logic based on viewport
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -42,10 +52,14 @@ export default function Home() {
           if (!video) return;
 
           if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-            video.muted = false;
-            video.play().catch(() => {});
+            if (video.paused) {
+              video.muted = false;
+              video.play().catch((e) => {
+                if (e.name !== 'AbortError') console.warn('Play error:', e);
+              });
+            }
           } else {
-            video.pause();
+            if (!video.paused) video.pause();
             video.muted = true;
           }
         });
@@ -64,37 +78,21 @@ export default function Home() {
     };
   }, [urls]);
 
-  // Swipe up/down gestures
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let startY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      const endY = e.changedTouches[0].clientY;
-      const diffY = startY - endY;
-
-      if (Math.abs(diffY) > 50) {
-        container.scrollBy({
-          top: diffY > 0 ? window.innerHeight : -window.innerHeight,
-          behavior: 'smooth',
+    const firstVideo = videoRefs.current[0];
+    if (firstVideo && urls[reels[0]?.id]) {
+      firstVideo.muted = false;
+      firstVideo
+        .play()
+        .catch((e) => {
+          if (e.name !== 'AbortError') {
+            console.warn('Autoplay error:', e);
+          }
         });
-      }
-    };
+    }
+  }, [urls, reels]);
 
-    container.addEventListener('touchstart', handleTouchStart);
-    container.addEventListener('touchend', handleTouchEnd);
-
-    return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, []);
+  containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
     <div
@@ -142,27 +140,31 @@ export default function Home() {
                 }}
               />
 
-              {/* Overlay Buttons */}
               <div
                 style={{
                   position: 'absolute',
                   right: '0.5rem',
-                  bottom: '8%',
+                  bottom: '5%',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '0.5rem',
                 }}
               >
                 <button
-                  onClick={(e) => {
-                    const target = e.currentTarget;
-                    target.classList.add('animate');
-                    setTimeout(() => target.classList.remove('animate'), 300);
+                  onClick={() => {
+                    setLikedReels((prev) => ({
+                      ...prev,
+                      [reel.id]: !prev[reel.id],
+                    }));
                   }}
                   className="animated-button"
-                  style={{ color: 'white', fontSize: '1.8rem' }}
+                  style={{
+                    color: likedReels[reel.id] ? 'red' : 'white',
+                    transition: 'transform 0.2s ease',
+                    transform: likedReels[reel.id] ? 'scale(1.2)' : 'scale(1)',
+                  }}
                 >
-                  ❤️
+                  {likedReels[reel.id] ? <AiFillHeart size={30} /> : <FiHeart size={30} />}
                 </button>
 
                 <button
@@ -172,39 +174,42 @@ export default function Home() {
                     setTimeout(() => target.classList.remove('animate'), 300);
                   }}
                   className="animated-button"
-                  style={{ color: 'white', fontSize: '1.8rem' }}
                 >
-                  💬
+                  <FiMessageCircle size={30} />
                 </button>
 
                 <button
-                  style={{ color: 'white', fontSize: '1.8rem' }}
+                  className="animated-button"
                   onClick={() => {
                     const shareUrl = window.location.origin;
                     if (navigator.share) {
                       navigator
                         .share({
                           title: 'Check out reels',
-                          // text: `Watch this sports reels on ${reel.celebrity}`,
                           url: shareUrl,
                         })
-                        .catch((error) => console.error('Share failed:', error));
+                        .catch((error) => {
+                          if (error.name !== 'AbortError') {
+                            console.error('Share failed:', error);
+                          }
+                        });
                     } else {
                       alert('Sharing not supported on this browser');
                     }
                   }}
                 >
-                  🔗
+                  <FiShare2 size={30} />
                 </button>
 
                 <button
-                  style={{ color: 'white', fontSize: '1.8rem' }}
+                  className="animated-button"
                   onClick={() => {
                     window.location.href = '/admin';
                   }}
                 >
-                  ➕
+                  <FiPlus size={30} />
                 </button>
+
               </div>
             </>
           )}

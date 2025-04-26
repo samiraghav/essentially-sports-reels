@@ -23,7 +23,6 @@ export async function textToSpeech(text: string): Promise<string> {
   const filePath = path.join('/tmp', fileName);
   const writeStream = fs.createWriteStream(filePath);
 
-  // ✅ Use AudioStream directly (it's a Node.js stream)
   await new Promise<void>((resolve, reject) => {
     (response.AudioStream as NodeJS.ReadableStream).pipe(writeStream);
     writeStream.on('finish', resolve);

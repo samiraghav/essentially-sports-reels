@@ -1,4 +1,3 @@
-// lib/videoGen.ts
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
 import path from 'path';
@@ -17,28 +16,40 @@ export async function generateVideo({
   audioPath: string;
   scriptText: string;
 }): Promise<string> {
-  const tmpDir = '/tmp/' + uuidv4();
+  const tmpDir = path.join('/tmp', uuidv4());
   fs.mkdirSync(tmpDir);
 
   const imagePaths: string[] = [];
 
   for (let i = 0; i < imageUrls.length; i++) {
-    const res = await fetch(imageUrls[i]);
-    const buffer = await res.buffer();
+    const image = imageUrls[i];
     const filePath = path.join(tmpDir, `img${i}.jpg`);
-    fs.writeFileSync(filePath, buffer);
+
+    if (image.startsWith('http')) {
+      // Download image from remote URL
+      const res = await fetch(image);
+      if (!res.ok) throw new Error(`Failed to fetch image: ${image}`);
+      const buffer = await res.buffer();
+      fs.writeFileSync(filePath, buffer);
+    } else {
+      // Local file (uploaded) — copy it
+      fs.copyFileSync(image, filePath);
+    }
+
     imagePaths.push(filePath);
   }
 
+  // Generate ffmpeg concat file
   const inputFileList = path.join(tmpDir, 'images.txt');
-  const durationPerImage = 5; // seconds
-  const totalDuration = durationPerImage * imagePaths.length;
+  const durationPerImage = 5;
 
-  // Write images.txt for ffmpeg slideshow
-  fs.writeFileSync(
-    inputFileList,
-    imagePaths.map(p => `file '${p}'\nduration ${durationPerImage}`).join('\n') + `\nfile '${imagePaths[imagePaths.length - 1]}'\n`
-  );
+  const content = imagePaths
+    .map(p => `file '${p}'\nduration ${durationPerImage}`)
+    .join('\n');
+
+  const lastImage = `file '${imagePaths[imagePaths.length - 1]}'`;
+
+  fs.writeFileSync(inputFileList, `${content}\n${lastImage}\n${lastImage}`);
 
   const outputPath = path.join(tmpDir, 'final.mp4');
 
