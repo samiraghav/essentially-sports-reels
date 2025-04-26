@@ -8,13 +8,14 @@ export async function generateScript(celebrityName: string) {
   const prompt = `
     You are a documentary narrator scriptwriter.
 
-    Write a clean, plain-text **80-second monologue** about the life and legacy of ${celebrityName}.
+    Write a clean, plain-text monologue about the life and legacy of ${celebrityName}.
 
+    - The script should be paced to last around **30 seconds** when read aloud in a natural American accent (like Matthew from Amazon Polly).
+    - Use short, emotionally engaging **sentences** and **brief paragraphs** that flow naturally like a voiceover.
     - Do NOT include any sound cues like "(music swells)" or "(soft piano begins)".
     - Do NOT use parentheses, bullets, numbers, or stage directions.
-    - Write in short, emotionally engaging **paragraphs** that flow like a single voiceover.
-    - Highlight major career milestones and one personal insight that defined them.
-    - Use only natural, plain narration — as if reading it aloud for a documentary.
+    - Highlight only the most iconic career milestones and one personal insight that defined them.
+    - Keep it plain, natural, and vivid — as if someone is simply telling the story aloud for a short documentary.
 
     Return only plain paragraph text.
     `;
