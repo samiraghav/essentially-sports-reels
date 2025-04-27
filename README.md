@@ -7,6 +7,9 @@ This is the frontend UI for the Essentially Sports Reels Platform – a mobile-f
 
 ---
 
+# Technical Breakdown - https://docs.google.com/document/d/1I_QO9635VGLPKW3bUQnvFitEt9335vCRgZAS49IAOb4/edit?tab=t.0
+# API Documentation - https://docs.google.com/document/d/12czsIA2UAOhWI4BkXUQbMa0Se1jfpJ2T61jD51H2wG8/edit?tab=t.0
+
 ## Features
 
 - **Mobile-first vertical UI** with scroll snapping (`snap-y`)
