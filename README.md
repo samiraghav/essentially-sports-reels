@@ -1,13 +1,12 @@
 # Essentially Sports Reels – Frontend
 
-This is the frontend UI for the Essentially Sports Reels Platform – a mobile-first, TikTok-style vertical video interface for watching AI-generated sports reels.
+This is the frontend UI for the Essentially Sports Reels Platform – a mobile-first, Instagram-style vertical video interface for watching AI-generated sports reels.
 
 ---
 
 ## Features
 
 - **Mobile-first vertical UI** with scroll snapping (`snap-y`)
-- **Auto-play video** when visible, pause when out of view
 - `/admin` route for generating reels:
   - Enter player name → get real-time suggestions from TheSportsDB
   - Auto-fill sport + thumbnail
