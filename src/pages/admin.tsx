@@ -92,13 +92,11 @@ export default function AdminPanel() {
   return (
     <div className="max-w-screen-sm flex justify-center m-2">
       <div className="p-8 w-full aspect-w-9 aspect-h-16 p-4">
-      {/* <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md border border-gray-200"> */}
         <h1 className="text-xl font-semibold text-gray-800 mb-1 text-center">
-          Generate Reels
+          Generate Reels with AI
         </h1>
         <p className="text-sm text-gray-500 mb-6 text-center">
-          {/* Generate assets for your reels using the power of AI. */}
-          Enter the name of a sports player to automatically generate a compelling narrative using Google Gemini AI. The system will fetch five relevant images from the Pexels API and use FFmpeg to seamlessly combine the script's voiceover with visuals, producing a dynamic sports history reel.
+          Enter a sports player's name to automatically generate a compelling narrative using Google Gemini AI. The system fetches five relevant images from the Pexels API and uses Amazon Polly to create a realistic voiceover, which is then combined with visuals via FFmpeg to produce a dynamic sports history reel.
         </p>
 
         <label className="block mb-2 font-medium text-sm text-gray-700">
