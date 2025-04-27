@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Essentially Sports Reels – Frontend
+
+This is the frontend UI for the Essentially Sports Reels Platform – a mobile-first, TikTok-style vertical video interface for watching AI-generated sports reels.
+
+---
+
+## Features
+
+- **Mobile-first vertical UI** with scroll snapping (`snap-y`)
+- **Auto-play video** when visible, pause when out of view
+- `/admin` route for generating reels:
+  - Enter player name → get real-time suggestions from TheSportsDB
+  - Auto-fill sport + thumbnail
+  - Upload optional custom images
+- `/` root route displays Instagram Reels-style player:
+  - Follow, Like, Share, Add buttons
+  - Thumbnails and metadata displayed
+- **Serverless API Routes** (Next.js):
+  - `/api/generate`: Triggers full video generation
+  - `/api/reels`: Lists all generated videos with metadata
+  - `/api/reels/:id`: Returns signed S3 URL for secure video playback
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Run dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+App runs at http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
+- Create .env.local:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_S3_BUCKET=
+PEXELS_API_KEY=
+OPENAI_API_KEY=
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Routes Overview
+- /admin – Admin panel to generate new reels
 
-## Learn More
+- / – Public reel viewer UI
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
+```bash
+Next.js 15.3.1
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+TypeScript
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tailwind CSS
 
-## Deploy on Vercel
+Amazon S3 (media storage)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Formidable (file parsing)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+FFmpeg (via external microservice)
+
+Polly (text-to-speech)
+
+Gemini / OpenAI (script generation)
+
+Pexels API (image sourcing)
+```
+
+## Deployment
+- Frontend deployed on Vercel
+
+- FFmpeg service hosted separately (e.g., Render)
+
+
