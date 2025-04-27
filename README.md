@@ -2,6 +2,9 @@
 
 This is the frontend UI for the Essentially Sports Reels Platform – a mobile-first, Instagram-style vertical video interface for watching AI-generated sports reels.
 
+Live at https://essentially-sports-reels-theta.vercel.app/
+Create reels from https://essentially-sports-reels-theta.vercel.app/admin
+
 ---
 
 ## Features
