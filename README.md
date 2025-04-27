@@ -12,7 +12,7 @@ This is the frontend UI for the Essentially Sports Reels Platform – a mobile-f
 
 ## Features
 
-- **Mobile-first vertical UI** with scroll snapping (`snap-y`)
+- **Mobile-first vertical UI**
 - `/admin` route for generating reels:
   - Enter player name → get real-time suggestions from TheSportsDB
   - Auto-fill sport + thumbnail
