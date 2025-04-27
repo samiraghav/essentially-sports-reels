@@ -153,7 +153,7 @@ export default function Home() {
             style={{
               position: 'absolute',
               right: '0.5rem',
-              bottom: '16%',
+              bottom: '14%%',
               display: 'flex',
               flexDirection: 'column',
               gap: '0.5rem',
@@ -212,7 +212,7 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="absolute bottom-[16%] left-5 text-white z-10 flex flex-col gap-2">
+          <div className="absolute bottom-[14%%] left-5 text-white z-10 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <img
                 src={reel.thumbnail?.trim() ? reel.thumbnail : defaultPlayer.src}
