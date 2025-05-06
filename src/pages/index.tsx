@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
 import { FiHeart, FiMessageCircle, FiShare2, FiPlus } from 'react-icons/fi';
 import { AiFillHeart } from 'react-icons/ai';
 import defaultPlayer from '../../public/default-player.svg'
@@ -15,13 +14,6 @@ type Reel = {
 };
 
 export default function Home() {
-
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace('/admin');
-  }, [router]);
-
   const [reels, setReels] = useState<Reel[]>([]);
   const [urls, setUrls] = useState<{ [key: string]: string }>({});
   const containerRef = useRef<HTMLDivElement>(null);
